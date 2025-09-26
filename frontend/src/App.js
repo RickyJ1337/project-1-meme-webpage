@@ -1,23 +1,35 @@
-import logo from './logo.svg';
 import './App.css';
+import React, { useState } from 'react';
 
 function App() {
+
+  const [memeImage, setMemeImage] = useState(
+      "https://picsum.photos/400/300?random=0"
+    );
+
+  const generateImage = () => {
+    const randomNumber = Math.floor(Math.random() * 100);
+    const randomWidth = Math.floor(Math.random() * 1000);
+    const randomHeight = Math.floor(Math.random() * 1000);
+    setMemeImage(`https://picsum.photos/${randomWidth}/${randomHeight}?random=${randomNumber}`);
+  };
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
+      <header className="Meme-title">
         <p>
-          Edit <code>src/App.js</code> and also edit my nutsack and save to reload.
+          This is my Meme Generator App.
         </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
       </header>
+      <img
+        src={memeImage}
+        alt="Meme"
+      />
+      <button
+        onClick={generateImage}
+      >
+        Generate Meme
+      </button>
     </div>
   );
 }
