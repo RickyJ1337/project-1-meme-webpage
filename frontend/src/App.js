@@ -1,17 +1,30 @@
 import './App.css';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 function App() {
 
-  const [memeImage, setMemeImage] = useState(
-      "https://picsum.photos/400/300?random=0"
-    );
+  const [memeList, setMemeList] = useState([]);
+  const [memeImage, setCurrentMeme] = useState();
 
-  const generateImage = () => {
-    const randomNumber = Math.floor(Math.random() * 100);
-    const randomWidth = Math.floor(Math.random() * 1000);
-    const randomHeight = Math.floor(Math.random() * 1000);
-    setMemeImage(`https://picsum.photos/${randomWidth}/${randomHeight}?random=${randomNumber}`);
+  useEffect(() => {
+    fetch("https://api.imgflip.com/get_memes")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success) {
+          setMemeList(data.data.memes);
+          // Pick one meme initially
+          setCurrentMeme(
+            data.data.memes[Math.floor(Math.random() * data.data.memes.length)]
+          );
+        }
+      });
+  }, []);
+
+  const generateMeme = () => {
+    if (memeList.length > 0) {
+      const randomIndex = Math.floor(Math.random() * memeList.length);
+      setCurrentMeme(memeList[randomIndex]);
+    }
   };
 
   return (
@@ -22,11 +35,11 @@ function App() {
         </p>
       </header>
       <img
-        src={memeImage}
+        src={memeImage.url}
         alt="Meme"
       />
       <button
-        onClick={generateImage}
+        onClick={generateMeme}
       >
         Generate Meme
       </button>
