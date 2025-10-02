@@ -1,9 +1,11 @@
 package com.example.project_1_meme_webpage.entity;
 
+import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 
+@Entity
 public class Meme {
     @Id
     @GeneratedValue(strategy=GenerationType.IDENTITY)
@@ -12,8 +14,6 @@ public class Meme {
     private String url;
     private String topText;
     private String bottomText;
-
-    public Meme() {}
 
     public Meme(String url, String topText, String bottomText) {
         this.url = url;
