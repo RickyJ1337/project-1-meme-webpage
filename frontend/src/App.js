@@ -29,7 +29,7 @@ function App() {
       {currentMeme ? (
         <div className="Meme-body">
           <img
-            src={currentMeme.imageUrl}
+            src={currentMeme.url}
             alt="Meme"
             className="Meme-container"
           />

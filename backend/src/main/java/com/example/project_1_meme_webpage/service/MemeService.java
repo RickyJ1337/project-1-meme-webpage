@@ -1,14 +1,15 @@
 package com.example.project_1_meme_webpage.service;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import com.example.project_1_meme_webpage.dto.MemeDTO;
 import com.example.project_1_meme_webpage.entity.Meme;
+import com.example.project_1_meme_webpage.pojos.ImgflipApiResponsePOJO;
 import com.example.project_1_meme_webpage.repository.MemeRepository;
 
 import jakarta.transaction.Transactional;
@@ -19,35 +20,29 @@ public class MemeService {
     @Autowired
     private MemeRepository memeRepo;
 
-    public Meme getRandomMeme() {
-        final Random random = new Random();
-        final RestTemplate restTemplate = new RestTemplate();
+    final Random random = new Random();
+    final RestTemplate restTemplate = new RestTemplate();
 
+    public ImgflipApiResponsePOJO fetchFromImgflip() {
         String url = "https://api.imgflip.com/get_memes";
-        
-        Map<String, Object> response = restTemplate.getForObject(url, Map.class);
+        return restTemplate.getForObject(url, ImgflipApiResponsePOJO.class);
+    }
 
-        if (response != null && (boolean) response.get("success")) {
-            Map<String, Object> data = (Map<String, Object>) response.get("data");
-            List<Map<String, Object>> memes = (List<Map<String, Object>>) data.get("memes");
-
-            Map<String, Object> memeData = memes.get(random.nextInt(memes.size()));
-
-            String imageUrl = (String) memeData.get("url");
-            String name = (String) memeData.get("name");
-
-            String topText = "Top: " + name;
-            String bottomText = "Bottom: LOL 😂";
-
-            return new Meme(imageUrl, topText, bottomText);
+    public MemeDTO getRandomMeme() {
+        ImgflipApiResponsePOJO response = fetchFromImgflip();
+        if (response != null && response.isSuccess()) {
+            List<ImgflipApiResponsePOJO.Meme> memes = response.getData().getMemes();
+            ImgflipApiResponsePOJO.Meme meme = memes.get(random.nextInt(memes.size()));
+            return new MemeDTO(meme.getUrl(), "Top: " + meme.getName(), "Bottom: LOL 😂");
         }
 
-        return new Meme(
+        return new MemeDTO(
             "https://via.placeholder.com/400x300.png?text=No+Meme",
             "Couldn’t fetch from Imgflip",
             "Try again later!"
         );
     }
+        
 
     public List<Meme> getAllMemes() {
         return memeRepo.findAll();
