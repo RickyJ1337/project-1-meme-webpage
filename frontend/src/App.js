@@ -1,18 +1,23 @@
 import './App.css';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 function App() {
 
-  const [memeImage, setMemeImage] = useState(
-      "https://picsum.photos/400/300?random=0"
-    );
+  const [currentMeme, setCurrentMeme] = useState();
 
-  const generateImage = () => {
-    const randomNumber = Math.floor(Math.random() * 100);
-    const randomWidth = Math.floor(Math.random() * 1000);
-    const randomHeight = Math.floor(Math.random() * 1000);
-    setMemeImage(`https://picsum.photos/${randomWidth}/${randomHeight}?random=${randomNumber}`);
+  const fetchRandomMeme = async () => {
+    try {
+      const res = await fetch("http://localhost:8080/api/memes/random");
+      const data = await res.json();
+      setCurrentMeme(data);
+    } catch (err) {
+      console.error(err);
+    }
   };
+
+  useEffect(() => {
+    fetchRandomMeme();
+  }, []);
 
   return (
     <div className="App">
@@ -21,12 +26,25 @@ function App() {
           This is my Meme Generator App.
         </p>
       </header>
-      <img
-        src={memeImage}
-        alt="Meme"
-      />
+      {currentMeme ? (
+        <div className="Meme-body">
+          <img
+            src={currentMeme.url}
+            alt="Meme"
+            className="Meme-container"
+          />
+          <p className="Top-text">
+            {currentMeme.topText}
+          </p>
+          <p className="Bottom-text">
+            {currentMeme.bottomText}
+          </p>
+        </div>
+      ) : (
+        <p>Loading meme...</p>
+      )}
       <button
-        onClick={generateImage}
+        onClick={fetchRandomMeme}
       >
         Generate Meme
       </button>
